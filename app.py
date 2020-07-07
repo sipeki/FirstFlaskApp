@@ -8,6 +8,10 @@ app = Flask(__name__)
 def hello_world():
     return render_template('homepage.html', title="Homepage")
 
+@app.route('/about')
+def aboutus():
+    return render_template('about.html', title="About Us")
+
 
 if __name__ == '__main__':
     app.run()
