@@ -6,3 +6,5 @@ pymysql==0.9.3
 WTForms==2.3.1
 Flask-WTF==0.14.3
 email_validator==1.1.1
+flask_bcrypt==0.7.1
+flask-login==0.1.1

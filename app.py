@@ -2,8 +2,14 @@ from flask import Flask, redirect, url_for
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
+from flask_bcrypt import Bcrypt
+from forms import PostsForm, RegistrationForm
+from flask_login import LoginManager
 
-from forms import PostsForm
+bcrypt = Bcrypt()
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+
 
 app = Flask(__name__)
 
@@ -25,6 +31,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + \
 
 db = SQLAlchemy(app)
 
+
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     f_name = db.Column(db.String(30), nullable=False)
@@ -40,6 +47,28 @@ class Posts(db.Model):
                 'Content: ' + self.content
             ]
         )
+
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(500), nullable=False, unique=True)
+    password = db.Column(db.String(500), nullable=False)
+
+    def __repr__(self):
+        return ''.join(['UserID: ', str(self.id), '\r\n', 'Email: ',self.email])
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hash_pw = bcrypt.generate_password_hash(form.password.data)
+
+        user = Users(email=form.email.data, password=hash_pw)
+
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('home'))
+    return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/')
@@ -79,6 +108,12 @@ def create():
     db.session.add(post2)
     db.session.commit()
     return "Some Lovely data created"
+
+@app.route('/create2')
+def create2():
+    db.drop_all()
+    db.create_all()
+    return "Eveverything is gone"
 
 @app.route('/delete')
 def delete():
