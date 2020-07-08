@@ -6,15 +6,10 @@ from flask_bcrypt import Bcrypt
 from forms import PostsForm, RegistrationForm, LoginForm
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required, UserMixin
 
-login_manager = LoginManager()
-# login_manager.init_app()
-login_manager.login_view = 'login'
-
-bcrypt = Bcrypt()
-
-
-
 app = Flask(__name__)
+bcrypt = Bcrypt()
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
 # make more secure
 app.config['SECRET_KEY'] = 'c076a09b61f56e9338a7c7d97244d5b0'
@@ -80,7 +75,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/')
+
 @app.route('/home')
 def home():
     post_data = Posts.query.all()
@@ -132,7 +127,8 @@ def delete():
     db.session.commit()
     return "Eveverything is gone"
 
-@app.route("/login", methods=['GET', 'POST'])
+@app.route('/')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
