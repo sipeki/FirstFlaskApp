@@ -10,10 +10,14 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('add') }}">Add a new post</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <!--   put in if statement to check for logged in and  display from here   -->
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('add') }}">Add a new post</a>
+        <!-- to here -->
+            <a href="{{ url_for('logout') }}">Logout</a>
+
+        <a href="{{ url_for('register') }}">Register</a>
     </div>
     {% block body_content %}{% endblock %}
 </body>

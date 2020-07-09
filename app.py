@@ -34,7 +34,7 @@ db = SQLAlchemy(app)
 # l_name = db.Column(db.String(30), nullable=False)
 
 class Posts(db.Model):
-
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -44,9 +44,8 @@ class Posts(db.Model):
     def __repr__(self):
         return ''.join(
             [
-                'Title:  ' + self.title + '\n'
-                'Name:  ' + self.f_name + ' ' + self.l_name + '\n'
-                'Content: ' + self.content
+                'User ID: ', self.user_id, '\r\n',
+                'Title: ', self.title, '\r\n', self.content
             ]
         )
 
@@ -58,19 +57,17 @@ def load_user(id):
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(30), nullable=False)
-    last_name = db.Column(db.String(30), nullable=False)
-    email = db.Column(db.String(500), nullable=False, unique=True)
+    f_name = db.Column(db.String(30), nullable=False)
+    l_name = db.Column(db.String(30), nullable=False)
+    email = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String(500), nullable=False)
     posts = db.relationship('Posts', backref='author', lazy=True)
 
-#   removed: 'Name: ', self.first_name, ' ', self.last_name
-#       'Email: ', self.email, '\r\n',
-
     def __repr__(self):
         return ''.join([
-            'UserID: ', str(self.id), '\r\n',
-            'Title: ', self.title, '\r\n', self.conte
+            'User ID: ', str(self.id), '\r\n',
+            'Email: ', self.email, '\r\n',
+            'Name: ', self.first_name, ' ', self.last_name
         ])
 
 # def validate_email(self, email):
@@ -81,17 +78,20 @@ class Users(db.Model, UserMixin):
 
 #   modified @app.route('/register', methods=['GET', 'POST'])
 
-@app.route('/register')
+@app.route('/register' , methods=['GET', 'POST'])
 def register():
+
+    print("reg1")
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
     form = RegistrationForm()
+    print("reg2")
     if form.validate_on_submit():
         hash_pw = bcrypt.generate_password_hash(form.password.data)
         user = Users(
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
+            f_name=form.f_name.data,
+            l_name=form.l_name.data,
             email=form.email.data,
             password=hash_pw
         )
@@ -103,13 +103,14 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/home')
 def home():
     post_data = Posts.query.all()
     return render_template('homepage.html', title="Homepage", posts=post_data)
 
 @app.route('/about')
+@login_required
 def about():
     return render_template('about.html', title="About Us")
 
