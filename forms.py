@@ -28,6 +28,22 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
 
+    f_name = StringField(
+        'First name',
+        validators=[
+            DataRequired(),
+            Length(min=1, max=30)
+
+        ])
+
+    l_name = StringField(
+        'Last name',
+        validators=[
+            DataRequired(),
+            Length(min=1, max=30)
+
+        ])
+
     email = StringField('Email',
         validators = [
             DataRequired(),
@@ -49,25 +65,6 @@ class RegistrationForm(FlaskForm):
 
 
 class PostsForm(FlaskForm):
-    f_name = StringField(
-        'First name',
-        validators=[
-            DataRequired(),
-            Length(min=1, max=30)
-
-        ]
-
-    )
-
-    l_name = StringField(
-        'Last name',
-        validators=[
-            DataRequired(),
-            Length(min=1, max=30)
-
-        ]
-
-    )
 
     title = StringField(
         'Title',
@@ -75,9 +72,7 @@ class PostsForm(FlaskForm):
             DataRequired(),
             Length(min=4, max=100)
 
-        ]
-
-    )
+        ])
 
     content = StringField(
         'Content',
@@ -85,8 +80,6 @@ class PostsForm(FlaskForm):
             DataRequired(),
             Length(min=1, max=300)
 
-        ]
-
-    )
+        ])
 
     submit = SubmitField('Make a Post')

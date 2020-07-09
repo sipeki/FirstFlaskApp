@@ -79,13 +79,22 @@ class Users(db.Model, UserMixin):
 #    if user:
 #        raise ValidationError('Email already in use')
 
-@app.route('/register', methods=['GET', 'POST'])
+#   modified @app.route('/register', methods=['GET', 'POST'])
+
+@app.route('/register')
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
     form = RegistrationForm()
     if form.validate_on_submit():
         hash_pw = bcrypt.generate_password_hash(form.password.data)
-
-        user = Users(email=form.email.data, password=hash_pw)
+        user = Users(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data,
+            password=hash_pw
+        )
 
         db.session.add(user)
         db.session.commit()
