@@ -34,7 +34,7 @@ db = SQLAlchemy(app)
 # l_name = db.Column(db.String(30), nullable=False)
 
 class Posts(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -120,10 +120,9 @@ def add():
     form = PostsForm()
     if form.validate_on_submit():
         post_data = Posts(
-            f_name=form.f_name.data,
-            l_name=form.l_name.data,
             title=form.title.data,
             content=form.content.data,
+            author=current_user
         )
         db.session.add(post_data)
         db.session.commit()
