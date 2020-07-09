@@ -75,7 +75,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-
+@app.route('/')
 @app.route('/home')
 def home():
     post_data = Posts.query.all()
@@ -127,15 +127,17 @@ def delete():
     db.session.commit()
     return "Eveverything is gone"
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
+        print("1 login")
         user = Users.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
+            print("2 login")
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             if next_page:
