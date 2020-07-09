@@ -5,6 +5,7 @@ from os import environ
 from flask_bcrypt import Bcrypt
 from forms import PostsForm, RegistrationForm, LoginForm
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required, UserMixin
+from datetime import datetime
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -28,14 +29,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://' + \
                                         environ.get('MYSQL_DB_NAME')
 
 db = SQLAlchemy(app)
-
+# Then remove the first and last name columns from the Posts table and add these lines to it.
+# removed f_name = db.Column(db.String(30), nullable=False)
+# l_name = db.Column(db.String(30), nullable=False)
 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    f_name = db.Column(db.String(30), nullable=False)
-    l_name = db.Column(db.String(30), nullable=False)
     title = db.Column(db.String(100), nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.String(300), nullable=False, unique=True)
+
 
     def __repr__(self):
         return ''.join(
@@ -54,11 +58,26 @@ def load_user(id):
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(30), nullable=False)
+    last_name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(500), nullable=False, unique=True)
     password = db.Column(db.String(500), nullable=False)
+    posts = db.relationship('Posts', backref='author', lazy=True)
+
+#   removed: 'Name: ', self.first_name, ' ', self.last_name
+#       'Email: ', self.email, '\r\n',
 
     def __repr__(self):
-        return ''.join(['UserID: ', str(self.id), '\r\n', 'Email: ',self.email])
+        return ''.join([
+            'UserID: ', str(self.id), '\r\n',
+            'Title: ', self.title, '\r\n', self.conte
+        ])
+
+# def validate_email(self, email):
+#    user = Users.query.filter_by(email=email.data).first()
+
+#    if user:
+#        raise ValidationError('Email already in use')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -104,7 +123,7 @@ def add():
         return render_template('post.html', title='Add a post', form=form)
 
 
-@app.route('/create')
+@app.route('/createpost')
 def create():
     db.create_all()
     post = Posts(f_name='Tadas', l_name='Vaidotas', title='Mr', content='Text line')
@@ -114,8 +133,8 @@ def create():
     db.session.commit()
     return "Some Lovely data created"
 
-@app.route('/create2')
-def create2():
+@app.route('/create')
+def create():
     db.drop_all()
     db.create_all()
     return "Eveverything is gone"
