@@ -124,7 +124,7 @@ def add():
 
 
 @app.route('/createpost')
-def create():
+def createpost():
     db.create_all()
     post = Posts(f_name='Tadas', l_name='Vaidotas', title='Mr', content='Text line')
     post2 = Posts(f_name='Simon', l_name='Kindlen', title='Mr', content='Another Text line')
@@ -137,7 +137,7 @@ def create():
 def create():
     db.drop_all()
     db.create_all()
-    return "Eveverything is gone"
+    return "Eveverything is gone and tables recreated"
 
 @app.route('/delete')
 def delete():
