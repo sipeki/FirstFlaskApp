@@ -3,7 +3,7 @@ from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
 from flask_bcrypt import Bcrypt
-from forms import PostsForm, RegistrationForm, LoginForm
+from forms import PostsForm, RegistrationForm, UpdateAccountForm, LoginForm
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required, UserMixin
 from datetime import datetime
 
@@ -32,6 +32,14 @@ db = SQLAlchemy(app)
 # Then remove the first and last name columns from the Posts table and add these lines to it.
 # removed f_name = db.Column(db.String(30), nullable=False)
 # l_name = db.Column(db.String(30), nullable=False)
+
+# might need to remove
+def validate_email(self, email):
+    if email.data != current_user.email:
+        user = Users.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('Email already in use')
+
 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -179,6 +187,22 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        current_user.f_name = form.f_name.data
+        current_user.l_name = form.l_name.data
+        current_user.email = form.email.data
+        db.session.commit()
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.f_name.data = current_user.f_name
+        form.l_name.data = current_user.l_name
+        form.email.data = current_user.email
+    return render_template('account.html', title='Account', form=form)
 
 if __name__ == '__main__':
     app.run()
