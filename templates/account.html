@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block body_content %}
-    <h1>{{ form.f_name }} ' ' {{ form.l_name }}</h1>
+    <h1>{{ current_user.f_name }}  {{ current_user.l_name }}</h1>
     <p>Your Details</p>
     <div class='form'>
         <form method='POST' action=''>
