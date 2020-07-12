@@ -3,6 +3,8 @@ from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
 from flask_bcrypt import Bcrypt
+from wtforms import ValidationError
+
 from forms import PostsForm, RegistrationForm, UpdateAccountForm, LoginForm
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required, UserMixin
 from datetime import datetime
@@ -150,18 +152,21 @@ def createpost():
     db.session.commit()
     return "Some Lovely data created"
 
+
 @app.route('/create')
 def create():
     db.drop_all()
     db.create_all()
     return "Eveverything is gone and tables recreated"
 
+
 @app.route('/delete')
 def delete():
     db.drop_all()
     # db.session.query(Posts).delete()
     db.session.commit()
-    return "Eveverything is gone"
+    return "Everything is gone"
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
@@ -209,12 +214,13 @@ def account():
 def account_delete():
     user = current_user.id
     account = Users.query.filter_by(id=user).first()
-    post = Posts.query.filter_by(user_id=user).delete()
+#   post = Posts.query.filter_by(user_id=user).delete()
     logout_user()
     db.session.delete(account)
-    db.session.delete(post)
+#   db.session.delete(post)
     db.session.commit()
     return redirect(url_for('register'))
+
 
 if __name__ == '__main__':
     app.run()
