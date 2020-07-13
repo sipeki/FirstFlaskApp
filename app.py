@@ -73,9 +73,10 @@ class Users(db.Model, UserMixin):
     password = db.Column(db.String(500), nullable=False)
     posts = db.relationship('Posts', backref='author', lazy=True)
 
+
     def __repr__(self):
         return ''.join([
-            'User ID: ', str(self.id), '\r\n',
+            'User ID: ', self.id, '\r\n',
             'Email: ', self.email, '\r\n',
             'Name: ', self.first_name, ' ', self.last_name
         ])
@@ -209,16 +210,17 @@ def account():
         form.email.data = current_user.email
     return render_template('account.html', title='Account', form=form)
 
-@app.route("/account/delete", methods=["GET", "POST"])
+@app.route("/account/delete", methods=["GET", "POST", "DELETE"])
 @login_required
 def account_delete():
     user = current_user.id
-    account = Users.query.filter_by(id=user).first()
-#   post = Posts.query.filter_by(user_id=user).delete()
-    logout_user()
-    db.session.delete(account)
-#   db.session.delete(post)
+    post = Posts.__table__.delete().where(Posts.user_id == current_user.id)
+    account1 = Users.query.filter_by(id=user).first()
+    print("before delete")
+    db.session.execute(post)
+    db.session.delete(account1)
     db.session.commit()
+    logout_user()
     return redirect(url_for('register'))
 
 
