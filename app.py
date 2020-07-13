@@ -216,7 +216,6 @@ def account_delete():
     user = current_user.id
     post = Posts.__table__.delete().where(Posts.user_id == current_user.id)
     account1 = Users.query.filter_by(id=user).first()
-    print("before delete")
     db.session.execute(post)
     db.session.delete(account1)
     db.session.commit()
